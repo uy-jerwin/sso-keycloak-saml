@@ -1,175 +1,131 @@
 import { useState, useEffect } from 'react';
+import { Routes, Route, Link } from 'react-router-dom';
 import keycloak from './keycloak';
+import { SamlAuthProvider } from './context/SamlAuthContext';
+import HomePage from './pages/HomePage';
+import OidcProtectedPage from './pages/OidcProtectedPage';
+import SamlProtectedPage from './pages/SamlProtectedPage';
+import ProtectedRoute from './components/ProtectedRoute';
+import SamlProtectedRoute from './components/SamlProtectedRoute';
 
 function App() {
-  const [authenticated, setAuthenticated] = useState(false);
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+  const [keycloakReady, setKeycloakReady] = useState(false);
+  const [oidcAuthenticated, setOidcAuthenticated] = useState(false);
 
   useEffect(() => {
-    keycloak
-      .init({
-        onLoad: 'check-sso',
-        silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
-        pkceMethod: 'S256',
-      })
-      .then((auth) => {
-        setAuthenticated(auth);
-        if (auth) {
-          setUser(keycloak.tokenParsed);
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
+    const initKeycloak = async () => {
+      try {
+        const auth = await keycloak.init({
+          onLoad: 'check-sso',
+          silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+          pkceMethod: 'S256',
+        });
+        setOidcAuthenticated(auth);
+        setKeycloakReady(true);
+      } catch (err) {
         console.error('Keycloak init failed:', err);
-        setLoading(false);
-      });
+        setKeycloakReady(true);
+      }
+    };
+
+    initKeycloak();
   }, []);
 
-  const handleLogin = () => {
-    keycloak.login();
-  };
-
-  const handleLogout = () => {
-    keycloak.logout({ redirectUri: window.location.origin });
-  };
-
-  const handleRefreshToken = () => {
-    keycloak
-      .updateToken(30)
-      .then((refreshed) => {
-        if (refreshed) {
-          setUser(keycloak.tokenParsed);
-          console.log('Token refreshed');
-        } else {
-          console.log('Token still valid');
-        }
-      })
-      .catch(() => {
-        console.error('Failed to refresh token');
-      });
-  };
-
-  if (loading) {
+  if (!keycloakReady) {
     return (
-      <div style={styles.container}>
-        <div style={styles.card}>
-          <p>Loading...</p>
-        </div>
+      <div style={styles.loading}>
+        <p>Loading...</p>
       </div>
     );
   }
 
   return (
-    <div style={styles.container}>
-      <div style={styles.card}>
-        <h1 style={styles.title}>React + Keycloak OIDC</h1>
-
-        {authenticated ? (
-          <div>
-            <div style={styles.userInfo}>
-              <h2>Welcome, {user?.preferred_username || user?.name || 'User'}!</h2>
-              <p><strong>Email:</strong> {user?.email || 'N/A'}</p>
-              <p><strong>Realm:</strong> {keycloak.realm}</p>
-            </div>
-
-            <div style={styles.tokenSection}>
-              <h3>Token Info</h3>
-              <p><strong>Token expires:</strong> {new Date(keycloak.tokenParsed?.exp * 1000).toLocaleString()}</p>
-              <details style={styles.details}>
-                <summary>View Access Token</summary>
-                <pre style={styles.tokenPre}>{keycloak.token}</pre>
-              </details>
-            </div>
-
-            <div style={styles.buttonGroup}>
-              <button style={styles.button} onClick={handleRefreshToken}>
-                Refresh Token
-              </button>
-              <button style={{ ...styles.button, ...styles.logoutButton }} onClick={handleLogout}>
-                Logout
-              </button>
+    <SamlAuthProvider>
+      <div style={styles.app}>
+        <nav style={styles.nav}>
+          <div style={styles.navContent}>
+            <span style={styles.logo}>Auth Demo</span>
+            <div style={styles.links}>
+              <Link to="/" style={styles.link}>Home</Link>
+              <Link to="/oidc-protected" style={styles.link}>OIDC Protected</Link>
+              <Link to="/saml-protected" style={styles.link}>SAML Protected</Link>
             </div>
           </div>
-        ) : (
-          <div>
-            <p style={styles.message}>You are not logged in.</p>
-            <button style={styles.button} onClick={handleLogin}>
-              Login with Keycloak
-            </button>
-          </div>
-        )}
+        </nav>
+
+        <main style={styles.main}>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route
+              path="/oidc-protected"
+              element={
+                <ProtectedRoute
+                  authenticated={oidcAuthenticated}
+                  keycloak={keycloak}
+                >
+                  <OidcProtectedPage keycloak={keycloak} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/saml-protected"
+              element={
+                <SamlProtectedRoute>
+                  <SamlProtectedPage />
+                </SamlProtectedRoute>
+              }
+            />
+          </Routes>
+        </main>
       </div>
-    </div>
+    </SamlAuthProvider>
   );
 }
 
 const styles = {
-  container: {
+  app: {
+    minHeight: '100vh',
+    backgroundColor: '#f5f5f5',
+    fontFamily: 'system-ui, -apple-system, sans-serif',
+  },
+  loading: {
     minHeight: '100vh',
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
     backgroundColor: '#f5f5f5',
-    fontFamily: 'system-ui, -apple-system, sans-serif',
   },
-  card: {
-    backgroundColor: 'white',
-    padding: '2rem',
-    borderRadius: '8px',
-    boxShadow: '0 2px 10px rgba(0, 0, 0, 0.1)',
-    maxWidth: '500px',
-    width: '100%',
-    margin: '1rem',
-  },
-  title: {
-    marginTop: 0,
-    color: '#333',
-    textAlign: 'center',
-  },
-  userInfo: {
-    backgroundColor: '#f0f9ff',
+  nav: {
+    backgroundColor: '#1f2937',
     padding: '1rem',
-    borderRadius: '4px',
-    marginBottom: '1rem',
+    boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
   },
-  tokenSection: {
-    marginBottom: '1rem',
-  },
-  details: {
-    marginTop: '0.5rem',
-  },
-  tokenPre: {
-    backgroundColor: '#f5f5f5',
-    padding: '0.5rem',
-    borderRadius: '4px',
-    overflow: 'auto',
-    maxHeight: '150px',
-    fontSize: '0.75rem',
-    wordBreak: 'break-all',
-  },
-  buttonGroup: {
+  navContent: {
+    maxWidth: '1200px',
+    margin: '0 auto',
     display: 'flex',
-    gap: '0.5rem',
+    alignItems: 'center',
+    justifyContent: 'space-between',
     flexWrap: 'wrap',
+    gap: '1rem',
   },
-  button: {
-    padding: '0.75rem 1.5rem',
-    backgroundColor: '#4f46e5',
+  logo: {
     color: 'white',
-    border: 'none',
-    borderRadius: '4px',
-    cursor: 'pointer',
-    fontSize: '1rem',
-    flex: 1,
+    fontSize: '1.25rem',
+    fontWeight: 'bold',
   },
-  logoutButton: {
-    backgroundColor: '#dc2626',
+  links: {
+    display: 'flex',
+    gap: '1.5rem',
   },
-  message: {
-    textAlign: 'center',
-    color: '#666',
-    marginBottom: '1rem',
+  link: {
+    color: '#d1d5db',
+    textDecoration: 'none',
+    fontSize: '0.95rem',
+    transition: 'color 0.2s',
+  },
+  main: {
+    padding: '1rem',
   },
 };
 
