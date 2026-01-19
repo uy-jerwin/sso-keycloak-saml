@@ -1,0 +1,61 @@
+{
+  "clientId": "web-saml",
+  "name": "",
+  "description": "",
+  "rootUrl": "http://localhost:3001",
+  "adminUrl": "http://localhost:3001/api/saml/callback",
+  "baseUrl": "http://localhost:3000",
+  "surrogateAuthRequired": false,
+  "enabled": true,
+  "alwaysDisplayInConsole": true,
+  "clientAuthenticatorType": "client-secret",
+  "redirectUris": [
+    "http://localhost:3001/*"
+  ],
+  "webOrigins": [
+    "http://localhost:3001"
+  ],
+  "notBefore": 0,
+  "bearerOnly": false,
+  "consentRequired": false,
+  "standardFlowEnabled": true,
+  "implicitFlowEnabled": false,
+  "directAccessGrantsEnabled": true,
+  "serviceAccountsEnabled": false,
+  "publicClient": true,
+  "frontchannelLogout": true,
+  "protocol": "saml",
+  "attributes": {
+    "saml.assertion.signature": "true",
+    "saml.force.post.binding": "true",
+    "saml.encrypt": "false",
+    "saml.server.signature": "true",
+    "saml.server.signature.keyinfo.ext": "false",
+    "saml.signing.certificate": "MIICnzCCAYcCBgGb1Ygt0TANBgkqhkiG9w0BAQsFADATMREwDwYDVQQDDAh3ZWItc2FtbDAeFw0yNjAxMTkwOTEyMTBaFw0zNjAxMTkwOTEzNTBaMBMxETAPBgNVBAMMCHdlYi1zYW1sMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA+8YsMtAx+N/UiukbjZiLmfyUgbzj/NMgpjHUsmUZdAwXNjFMzSG/Hwu0SY+ga9zu8H/tY4ZksWXKJY7DRa6VCTOXMoc6h1nt7180kF9lovVgxCcTzLikhNfbFMfxMgBhWAjfqm2uvuoisKJJUlx1Yl/nSN53tr4v6PM7Na/54O+NUdyC/pN5SNeqXrPe2lZEPMVrPtn2GkdM8kHIR1vRwv4prx5DTzpYEOzSegy0cUdHnUYocDcdbtuThY+1drdDSZmMkKTByFVQx8t+ppM6uhI0lQFtl4UydQR6G+kVCAfTdS3MmETjQzHpZB/m4e4gJS1Op+NVC8/C0Q5iB6KEaQIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQBmFU9a0ji2EBAM0WEZazqo22rIJcwsDtDfmL2MAK8fuvKahgzpG+rkPMVpAWEQ4GkSST3NPJfW1gxmFepdwkSCW50J8AFy/rTMnsrRMhmg4k94zBIFJd+u4jDVrS7yZuruoyHAY2+XFH7G3FrBvRl1dbO8q0+kGqsk9vBFr5oMOcqBCBjgXabtGrECh5PaxYD4du2N4AOO41ac1ur9iSu6x1R9DJ6QXaeNrloYQo3gylgfXVLwOv6ZHdvZjkEdxcmsZkuq0IATJEG4d7YAyS3t0biSCzDD/g0L5WVDkMsUGNV3ke7UxgvH7mlJpqV9AlwPUWnHJjMHvjYTNgHx4LL/",
+    "saml.artifact.binding.identifier": "9hhKNg6sKsWwir5ATAJ/1NO+wZY=",
+    "saml.artifact.binding": "false",
+    "saml.signature.algorithm": "RSA_SHA256",
+    "saml_force_name_id_format": "true",
+    "saml.client.signature": "false",
+    "saml.authnstatement": "true",
+    "display.on.consent.screen": "false",
+    "saml_name_id_format": "username",
+    "saml.signing.private.key": "MIIEogIBAAKCAQEA+8YsMtAx+N/UiukbjZiLmfyUgbzj/NMgpjHUsmUZdAwXNjFMzSG/Hwu0SY+ga9zu8H/tY4ZksWXKJY7DRa6VCTOXMoc6h1nt7180kF9lovVgxCcTzLikhNfbFMfxMgBhWAjfqm2uvuoisKJJUlx1Yl/nSN53tr4v6PM7Na/54O+NUdyC/pN5SNeqXrPe2lZEPMVrPtn2GkdM8kHIR1vRwv4prx5DTzpYEOzSegy0cUdHnUYocDcdbtuThY+1drdDSZmMkKTByFVQx8t+ppM6uhI0lQFtl4UydQR6G+kVCAfTdS3MmETjQzHpZB/m4e4gJS1Op+NVC8/C0Q5iB6KEaQIDAQABAoIBAD00Bx4CEMfGR4FOGdHRpYv1A7fHDmfw/dSQs/r6yxVz8/eLQ/dwruhR3M1uAen+jsH9YxxouNUL4LhBDFSF1DpkpWpVx6NL9+RS0TEQU6Fpw1BjjHNdZjbZzyqt0QLd50vyekaQe6Ryv6SPCsJf8fQMSqmi1NiiQny/FeNe6CAmuBYMhTZQDuSs8W6BJU/3HWzVikwYWS5EeJZ8ydrJHp5jubj5NS5KEDJIi/IcZ2IaHZpBSEeUBluMjhQqQKvquolhBwiGeN4dzQH3+qgtoY61Dys2aVCyEascoq7qW3FCZlbP+rVZA89Y1v3dHgjgSiVLwCWGA+pjGj+WFlMPjIUCgYEA/n7Fe272beZ1UM1AbuUDKPFIhlYA6hYDJX5zxmmDvIO4+J1b90qwgG6pY9JK6Vq9jygw/xsxOXDGLASOUe4r4CwPG4QrO2Jrbje+T2+NEvB2UBdy2Um/lGct3aFwUgtZF0BFsda6AISmO4eF87xwFgwwF3cQmJ5yp8c/To4chpUCgYEA/UNIRudh295PsSY6nbmlNpKpiTB1C3n7SpV/3bXErmCB8WN4oDxThWk24fXRnxU2WNYoWfJ+qZ3SybwHnToAJk3rbYAp6aGOIPZnTDFkJ9KAVQSC9Pk02HM4mX0eUsZnYxSO/kfKs49N4lsksxlvcspDtyb0RetnrUeY1iD09YUCgYArtqjDJ+8qN3ClPWw44Btn1/IGKRWlH7zQnuTSCuO26MVH5veaBXlFxjxQShnV9WEkCtpHp2sQG7/eZbXwesGMkuTRbCVk4OXlG6wTxuxreWRJI431psZCfmqRbB536T0XUlHmVyTB3AcVqJSophB2qQdFsIzoOicljILiQmTB9QKBgD6oZLtWB3n0GFdFk/7trRhBVLxiRrLeLPOY5RefHtfdfIiSCYfrJOa+zxs8S+5FuzpjUXxfaELijwHmCSQ2806GvJZMvRHWLGmvTIMnPRY1GBbwlM2y0gYzC2+96sCj4XQ749y5OkcOT0CPOBcvVclajUJE2u5pfS77pa5kXPZZAoGATZi56yab3bcBSq3rkjbs717rWjaSPWfeffipPPk7y6b2fMfxaZLHdt+++o/NWhEMZFcZqBjaAOtLx6WA+WBoB3breCYadKf1acaKGJJVuy+lwOF7glHf6yJG1rWPHVqAYoC5QJKzztTtDRxJuH6q1fktf5Ns67vHPIErQOvLH1E=",
+    "saml.allow.ecp.flow": "false",
+    "saml_signature_canonicalization_method": "http://www.w3.org/2001/10/xml-exc-c14n#",
+    "saml.onetimeuse.condition": "false",
+    "saml.server.signature.keyinfo.xmlSigKeyInfoKeyNameTransformer": "NONE"
+  },
+  "authenticationFlowBindingOverrides": {},
+  "fullScopeAllowed": true,
+  "nodeReRegistrationTimeout": -1,
+  "defaultClientScopes": [
+    "role_list"
+  ],
+  "optionalClientScopes": [],
+  "access": {
+    "view": true,
+    "configure": true,
+    "manage": true
+  }
+}
