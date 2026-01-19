@@ -1,5 +1,38 @@
+import { useState, useEffect } from 'react';
+import { useSearchParams } from 'react-router-dom';
+
 function OidcProtectedPage({ keycloak }) {
   const user = keycloak.tokenParsed;
+  const [searchParams, setSearchParams] = useSearchParams();
+  const [samlAssertion, setSamlAssertion] = useState(null);
+  const [samlUser, setSamlUser] = useState(null);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const samlGenerated = searchParams.get('saml_generated');
+    const sessionId = searchParams.get('session');
+
+    if (samlGenerated === 'true' && sessionId) {
+      // Fetch the generated SAML assertion
+      fetch(`http://localhost:3001/api/saml/get-assertion/${sessionId}`, {
+        credentials: 'include'
+      })
+        .then(res => res.json())
+        .then(data => {
+          if (data.assertion) {
+            setSamlAssertion(data.assertion);
+            setSamlUser(data.user);
+          }
+        })
+        .catch(err => console.error('Failed to fetch assertion:', err))
+        .finally(() => {
+          // Clean up URL params
+          searchParams.delete('saml_generated');
+          searchParams.delete('session');
+          setSearchParams(searchParams);
+        });
+    }
+  }, [searchParams, setSearchParams]);
 
   const handleLogout = () => {
     keycloak.logout({ redirectUri: window.location.origin });
@@ -18,6 +51,12 @@ function OidcProtectedPage({ keycloak }) {
       .catch(() => {
         console.error('Failed to refresh token');
       });
+  };
+
+  const handleGenerateSamlAssertion = () => {
+    setLoading(true);
+    // Redirect to the SAML assertion generation endpoint
+    window.location.href = 'http://localhost:3001/api/saml/generate-assertion';
   };
 
   return (
@@ -47,10 +86,39 @@ function OidcProtectedPage({ keycloak }) {
           <button style={styles.button} onClick={handleRefreshToken}>
             Refresh Token
           </button>
+          <button
+            style={{ ...styles.button, ...styles.samlButton }}
+            onClick={handleGenerateSamlAssertion}
+            disabled={loading}
+          >
+            {loading ? 'Generating...' : 'Generate SAML Assertion'}
+          </button>
           <button style={{ ...styles.button, ...styles.logoutButton }} onClick={handleLogout}>
             Logout (OIDC)
           </button>
         </div>
+
+        {samlAssertion && (
+          <div style={styles.samlSection}>
+            <h3>SAML Assertion (web-saml)</h3>
+            {samlUser && (
+              <div style={styles.samlUserInfo}>
+                <p><strong>SAML User:</strong> {samlUser.displayName || samlUser.nameID}</p>
+                <p><strong>Email:</strong> {samlUser.email || 'N/A'}</p>
+              </div>
+            )}
+            <details style={styles.details}>
+              <summary>View SAML Assertion XML</summary>
+              <pre style={styles.assertionPre}>{samlAssertion}</pre>
+            </details>
+            <button
+              style={{ ...styles.button, ...styles.clearButton, marginTop: '0.5rem' }}
+              onClick={() => { setSamlAssertion(null); setSamlUser(null); }}
+            >
+              Clear Assertion
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -124,6 +192,34 @@ const styles = {
   },
   logoutButton: {
     backgroundColor: '#dc2626'
+  },
+  samlButton: {
+    backgroundColor: '#059669'
+  },
+  samlSection: {
+    marginTop: '1.5rem',
+    padding: '1rem',
+    backgroundColor: '#f0fdf4',
+    borderRadius: '4px',
+    border: '1px solid #86efac'
+  },
+  samlUserInfo: {
+    marginBottom: '0.5rem'
+  },
+  assertionPre: {
+    backgroundColor: '#f5f5f5',
+    padding: '0.5rem',
+    borderRadius: '4px',
+    overflow: 'auto',
+    maxHeight: '300px',
+    fontSize: '0.7rem',
+    whiteSpace: 'pre-wrap',
+    wordBreak: 'break-all'
+  },
+  clearButton: {
+    backgroundColor: '#6b7280',
+    padding: '0.5rem 1rem',
+    fontSize: '0.875rem'
   }
 };
 
