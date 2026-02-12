@@ -1,9 +1,11 @@
 import { useState, useEffect, useRef } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import keycloak from './keycloak';
+import keycloak1 from './keycloak1';
 import { SamlAuthProvider } from './context/SamlAuthContext';
 import HomePage from './pages/HomePage';
 import OidcProtectedPage from './pages/OidcProtectedPage';
+import OidcProtectedPage1 from './pages/OidcProtectedPage1';
 import SamlProtectedPage from './pages/SamlProtectedPage';
 import ProtectedRoute from './components/ProtectedRoute';
 import SamlProtectedRoute from './components/SamlProtectedRoute';
@@ -11,6 +13,7 @@ import SamlProtectedRoute from './components/SamlProtectedRoute';
 function App() {
   const [keycloakReady, setKeycloakReady] = useState(false);
   const [oidcAuthenticated, setOidcAuthenticated] = useState(false);
+  const [oidc1Authenticated, setOidc1Authenticated] = useState(false);
   const initCalled = useRef(false);
 
   useEffect(() => {
@@ -25,6 +28,14 @@ function App() {
           pkceMethod: 'S256',
         });
         setOidcAuthenticated(auth);
+
+        const auth1 = await keycloak1.init({
+          onLoad: 'check-sso',
+          silentCheckSsoRedirectUri: window.location.origin + '/silent-check-sso.html',
+          pkceMethod: 'S256',
+        });
+        setOidc1Authenticated(auth1);
+
         setKeycloakReady(true);
       } catch (err) {
         console.error('Keycloak init failed:', err);
@@ -52,6 +63,7 @@ function App() {
             <div style={styles.links}>
               <Link to="/" style={styles.link}>Home</Link>
               <Link to="/oidc-protected" style={styles.link}>OIDC Protected</Link>
+              <Link to="/oidc-protected-1" style={styles.link}>OIDC Protected 2</Link>
               <Link to="/saml-protected" style={styles.link}>SAML Protected</Link>
             </div>
           </div>
@@ -68,6 +80,17 @@ function App() {
                   keycloak={keycloak}
                 >
                   <OidcProtectedPage keycloak={keycloak} />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/oidc-protected-1"
+              element={
+                <ProtectedRoute
+                  authenticated={oidc1Authenticated}
+                  keycloak={keycloak1}
+                >
+                  <OidcProtectedPage1 keycloak={keycloak1} />
                 </ProtectedRoute>
               }
             />

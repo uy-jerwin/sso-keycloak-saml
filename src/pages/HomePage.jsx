@@ -4,13 +4,21 @@ function HomePage() {
       <div style={styles.card}>
         <h1 style={styles.title}>Authentication Demo</h1>
         <p style={styles.description}>
-          This app demonstrates both OIDC and SAML authentication with Keycloak.
+          This app demonstrates OIDC, SAML, and Single Sign-On (SSO) with Keycloak.
         </p>
         <div style={styles.routes}>
           <div style={styles.route}>
             <h3>/oidc-protected</h3>
             <p>Protected by OpenID Connect using keycloak-js (client-side)</p>
             <p><strong>Client ID:</strong> web-openid</p>
+          </div>
+          <div style={styles.route}>
+            <h3>/oidc-protected-1</h3>
+            <p>Second OIDC client — demonstrates SSO (auto-login via shared Keycloak session)</p>
+            <p><strong>Client ID:</strong> web-openid-1</p>
+            <p style={{ fontSize: '0.85rem', color: '#92400e' }}>
+              <strong>Hint:</strong> Log in via /oidc-protected first, then visit this page — no login prompt!
+            </p>
           </div>
           <div style={styles.route}>
             <h3>/saml-protected</h3>
