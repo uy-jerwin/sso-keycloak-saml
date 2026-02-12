@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { Routes, Route, Link } from 'react-router-dom';
 import keycloak from './keycloak';
 import { SamlAuthProvider } from './context/SamlAuthContext';
@@ -11,8 +11,12 @@ import SamlProtectedRoute from './components/SamlProtectedRoute';
 function App() {
   const [keycloakReady, setKeycloakReady] = useState(false);
   const [oidcAuthenticated, setOidcAuthenticated] = useState(false);
+  const initCalled = useRef(false);
 
   useEffect(() => {
+    if (initCalled.current) return;
+    initCalled.current = true;
+
     const initKeycloak = async () => {
       try {
         const auth = await keycloak.init({

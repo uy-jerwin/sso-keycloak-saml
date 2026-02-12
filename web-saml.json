@@ -4,7 +4,7 @@
   "description": "",
   "rootUrl": "http://localhost:3001",
   "adminUrl": "http://localhost:3001/api/saml/callback",
-  "baseUrl": "http://localhost:3000",
+  "baseUrl": "http://localhost:3001",
   "surrogateAuthRequired": false,
   "enabled": true,
   "alwaysDisplayInConsole": true,
@@ -46,6 +46,44 @@
     "saml.onetimeuse.condition": "false",
     "saml.server.signature.keyinfo.xmlSigKeyInfoKeyNameTransformer": "NONE"
   },
+  "protocolMappers": [
+    {
+      "name": "X500 email",
+      "protocol": "saml",
+      "protocolMapper": "saml-user-property-mapper",
+      "consentRequired": false,
+      "config": {
+        "attribute.nameformat": "URI Reference",
+        "user.attribute": "email",
+        "friendly.name": "email",
+        "attribute.name": "urn:oid:1.2.840.113549.1.9.1"
+      }
+    },
+    {
+      "name": "X500 givenName",
+      "protocol": "saml",
+      "protocolMapper": "saml-user-property-mapper",
+      "consentRequired": false,
+      "config": {
+        "attribute.nameformat": "URI Reference",
+        "user.attribute": "firstName",
+        "friendly.name": "givenName",
+        "attribute.name": "urn:oid:2.5.4.42"
+      }
+    },
+    {
+      "name": "X500 surname",
+      "protocol": "saml",
+      "protocolMapper": "saml-user-property-mapper",
+      "consentRequired": false,
+      "config": {
+        "attribute.nameformat": "URI Reference",
+        "user.attribute": "lastName",
+        "friendly.name": "surname",
+        "attribute.name": "urn:oid:2.5.4.4"
+      }
+    }
+  ],
   "authenticationFlowBindingOverrides": {},
   "fullScopeAllowed": true,
   "nodeReRegistrationTimeout": -1,
