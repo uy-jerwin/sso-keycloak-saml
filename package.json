@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "dev": "concurrently \"npm run dev:vite\" \"npm run dev:server\"",
+    "dev": "concurrently \"npm run dev:vite\" \"npm run dev:server\" \"npm run dev:app2\"",
     "dev:vite": "vite",
     "dev:server": "node server/index.js",
+    "dev:app2": "node app2/server.js",
     "build": "vite build",
     "preview": "vite preview"
   },

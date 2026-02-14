@@ -93,6 +93,12 @@ function OidcProtectedPage({ keycloak }) {
           >
             {loading ? 'Generating...' : 'Generate SAML Assertion'}
           </button>
+          <a
+            href="http://localhost:3001/api/sso/initiate"
+            style={{ ...styles.button, ...styles.ssoButton, textDecoration: 'none', textAlign: 'center' }}
+          >
+            Open App 2 (SSO)
+          </a>
           <button style={{ ...styles.button, ...styles.logoutButton }} onClick={handleLogout}>
             Logout (OIDC)
           </button>
@@ -195,6 +201,9 @@ const styles = {
   },
   samlButton: {
     backgroundColor: '#059669'
+  },
+  ssoButton: {
+    backgroundColor: '#7c3aed'
   },
   samlSection: {
     marginTop: '1.5rem',

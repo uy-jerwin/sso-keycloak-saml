@@ -1,7 +1,45 @@
 import passport from 'passport';
 import { Strategy as SamlStrategy } from '@node-saml/passport-saml';
 
-export function configureSaml() {
+async function fetchKeycloakCert() {
+  // Get admin access token
+  const tokenRes = await fetch('http://localhost:8080/realms/master/protocol/openid-connect/token', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: new URLSearchParams({
+      grant_type: 'password',
+      client_id: 'admin-cli',
+      username: 'admin',
+      password: 'admin',
+    }),
+  });
+  if (!tokenRes.ok) {
+    throw new Error(`Failed to get admin token: ${tokenRes.status} ${tokenRes.statusText}`);
+  }
+  const { access_token } = await tokenRes.json();
+
+  // Fetch realm keys
+  const keysRes = await fetch('http://localhost:8080/admin/realms/local/keys', {
+    headers: { Authorization: `Bearer ${access_token}` },
+  });
+  if (!keysRes.ok) {
+    throw new Error(`Failed to fetch realm keys: ${keysRes.status} ${keysRes.statusText}`);
+  }
+  const keysData = await keysRes.json();
+
+  // Find the RSA signing certificate
+  const rsaSigKey = keysData.keys.find((k) => k.type === 'RSA' && k.use === 'SIG');
+  if (!rsaSigKey || !rsaSigKey.certificate) {
+    throw new Error('RSA signing certificate not found in Keycloak realm keys');
+  }
+
+  console.log('Fetched IDP certificate from Keycloak');
+  return rsaSigKey.certificate;
+}
+
+export async function configureSaml() {
+  const idpCert = await fetchKeycloakCert();
+
   const samlStrategy = new SamlStrategy(
     {
       // Service Provider (SP) configuration
@@ -9,9 +47,8 @@ export function configureSaml() {
       entryPoint: 'http://localhost:8080/realms/local/protocol/saml',
       issuer: 'web-saml',
 
-      // Keycloak SAML signing certificate
-      // Get this from: Keycloak Admin > Realm Settings > Keys > RS256 Certificate
-      idpCert: 'MIICmTCCAYECBgGcT9kwKTANBgkqhkiG9w0BAQsFADAQMQ4wDAYDVQQDDAVsb2NhbDAeFw0yNjAyMTIwMzE0MTlaFw0zNjAyMTIwMzE1NTlaMBAxDjAMBgNVBAMMBWxvY2FsMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA8DiwkaH5Yie6Wp4mSsutSTp5Mj7xdmkCd1qeFae1vuJMIgSL1k9M4NfUJPj5g4XYPpMliPF/y+NHlbGvkx0THJy2GA1K2A/jRrRTnXwEOT6HUZh6Eni8lj+IG4YEIvg/vni+SyU8qhqMf0u8rKOh2uA7Lq10flIHf8qs8cAlJJT9STV8LUiyK67/kvMCICtMNzfH6DV8dybqHM3Lrys7tWnC2H4dCBxPpVW0r3K+FJxMB9nHPRbQ9JPo2Xf9SGpoUoKKu0rFMTifyI5tLzrW2iRul1+9qizoqQgINZy+WHfIBuwQpfittQcfXXVnZ3XlhvvxkGEPUVZWWhE/2egAiwIDAQABMA0GCSqGSIb3DQEBCwUAA4IBAQAZOJ3aBzCJJarjNjGbMjH8QPIh57Rh1PNUL2RHDtvZQ9fvdvOfO6xVCRDDpkmF0URHMn9oLmCuwSp66HCUge3FZpSejttcl1Af8iUqynvfMoL0pyUgBrLqTYcx/VxFqWKEjKlNpVX9xRKR0MmsKLOj0DyxqTrmpxFytmzjs9LiMvAT+NWGnazxsYiBaUS+Rsy84M2helhWBwaXFVlyipTWfNjAt3Fdyo0Fhtg1RF5QVr8SF6qjSpepDIXPXQsMs5wk44eRHDaSIdRIap9ao9yVfirdkZUrgMQziQ2aom+JBMBEooaVCHKo5gx5RzWnsyA7sRZz67XGI9p4It4BbPbd',
+      // Keycloak SAML signing certificate (fetched from Admin API)
+      idpCert,
       
       // Assertion Consumer Service URL
       callbackUrl: 'http://localhost:3001/api/saml/callback',

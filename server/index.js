@@ -5,13 +5,14 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { configureSaml } from './config/saml.js';
 import authRoutes from './routes/auth.js';
+import ssoRoutes from './routes/sso.js';
 
 const app = express();
 const PORT = process.env.SAML_SERVER_PORT || 3001;
 
 // Middleware
 app.use(cors({
-  origin: 'http://localhost:3000',
+  origin: ['http://localhost:3000', 'http://localhost:3100'],
   credentials: true
 }));
 app.use(express.urlencoded({ extended: true }));
@@ -35,10 +36,11 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // Configure SAML strategy
-configureSaml();
+await configureSaml();
 
 // Routes
 app.use('/api/saml', authRoutes);
+app.use('/api/sso', ssoRoutes);
 
 app.listen(PORT, () => {
   console.log(`SAML Auth Server running on http://localhost:${PORT}`);

@@ -10,10 +10,12 @@
   "alwaysDisplayInConsole": true,
   "clientAuthenticatorType": "client-secret",
   "redirectUris": [
-    "http://localhost:3000/*"
+    "http://localhost:3000/*",
+    "http://localhost:3100/*"
   ],
   "webOrigins": [
-    "http://localhost:3000"
+    "http://localhost:3000",
+    "http://localhost:3100"
   ],
   "notBefore": 0,
   "bearerOnly": false,
@@ -26,7 +28,7 @@
   "frontchannelLogout": true,
   "protocol": "openid-connect",
   "attributes": {
-    "post.logout.redirect.uris": "http://localhost:3000/*",
+    "post.logout.redirect.uris": "http://localhost:3000/*##http://localhost:3100/*",
     "oauth2.device.authorization.grant.enabled": "false",
     "backchannel.logout.revoke.offline.tokens": "false",
     "use.refresh.tokens": "true",
